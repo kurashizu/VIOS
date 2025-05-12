@@ -1,0 +1,9 @@
+{
+    "IP": "127.0.0.1",
+    "sending_port": 9000,
+    "listening_port": 9001,
+    "terminal": {
+        "waiting_time": 0.25
+    },
+    "is_banner_enabled": false
+}
