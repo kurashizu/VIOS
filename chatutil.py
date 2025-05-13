@@ -5,7 +5,90 @@ from terminal import Terminal
 from vkey import Keyboard
 from simpleim import SimpleIM
 import time
+import requests
 
 with open('gemini_api_key.txt', 'r', encoding="utf-8") as gemini_api_key:
     API_KEY = gemini_api_key.read()
 
+API_URL = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={API_KEY}"
+
+headers = {
+    "Content-Type": "application/json"
+}
+
+def chat_with_gemini(prompt: str):
+    data = {
+        "contents": [
+            {
+                "parts": [
+                    {
+                        "text": prompt
+                    }
+                ]
+            }
+        ]
+    }
+
+    response = requests.post(API_URL, headers=headers, json=data)
+
+    if response.status_code == 200:
+        reply = response.json()["candidates"][0]["content"]["parts"][0]["text"]
+        return reply
+    else:
+        return f"Error {response.status_code}: {response.text}"
+
+
+if __name__ == "__main__":
+    
+    terminal = Terminal()
+    keyboard = Keyboard()
+    simpleim = SimpleIM(keyboard, terminal)
+
+    keyboard.serve()
+    keyboard.clear()
+
+    terminal.enable()
+    terminal.cursor_to(7,20)
+    terminal.print("VIOS Initialising...".rjust(20))
+    terminal.clear(force=True)
+    
+    while True:
+        terminal.cursor_to(0, 0)
+        terminal.print("VIOS Chatbot <Type '/?' for help>".center(40,' '))
+        terminal.print(" ")
+        terminal.print(" ")
+        terminal.print(" ")
+
+        user_input = simpleim.input(offset=(4,0), size=(4,40))
+
+        if user_input == '/?':
+            user_outputs = []
+            user_outputs.append("This is a AI chatbot utility. You can type via the keyboard, then press Enter to get response.")
+            user_outputs.append("NB: Press Fn+w/a/s/d so you can move the cursor around!")
+            user_outputs.append(" ")
+            user_outputs.append("https://github.com/kurashizu/VIOS".rjust(40))
+            terminal.cursor_to(1, 0)
+            for msg in user_outputs:
+                terminal.print(msg)
+            terminal.cursor_to(0, 0)
+            terminal.print("Press Esc to Continue".center(40,'-'))
+            keyboard.waitKey(41) # wait for Esc
+            continue
+
+        prompt = f'Your name is VIOS standing for Virtual IO System. You are gonna receive message from a user \
+            who are talking to you. You should make a short response less than 300 letters in total. \
+            And remember you can only speak English with only ASCII characters! \
+            The user is saying : "{user_input}"'
+        
+        terminal.cursor_to(0, 0)
+        terminal.print("VIOS Thinking".center(40,'-'))
+        response = chat_with_gemini(prompt)
+        user_output = f"VIOS: {response}".ljust(160-40-6)
+        
+        print(user_output)
+        terminal.cursor_to(1, 0)
+        terminal.print(user_output)
+        terminal.cursor_to(0, 0)
+        terminal.print("Press Enter to Continue...".center(40,'-'))
+
+        keyboard.waitKey(40) # wait for Enter

@@ -146,6 +146,20 @@ class Keyboard():
         self.lock.acquire()
         self.status[key] = value
         self.lock.release()
+    
+    def waitKey(self, scancode=0):
+        '''
+        wait for key with specified scancode (0 = any scancode)
+        '''
+        while 1:
+            key_status = self.getStatus()
+            if scancode:
+                if key_status['scancode'] == scancode:
+                    break
+            elif key_status['scancode']:
+                break
+            time.sleep(0.05)
+        return key_status
 
     def clear(self):
         self.sendKey('ctrl', False)

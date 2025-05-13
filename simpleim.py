@@ -5,7 +5,7 @@ from terminal import Terminal
 import time
 
 class SimpleIM():
-    def __init__(self, keyboard="Keyboard()", terminal="Terminal()"):
+    def __init__(self, keyboard: Keyboard, terminal: Terminal):
         self.keyboard = keyboard
         self.terminal = terminal
 
@@ -149,13 +149,16 @@ class SimpleIM():
 
             self.terminal.refresh()
 
-        def wait_key():
+        def wait_key(key=None):
             # wait for keys that have scancodes
             # except for Ctrl, Alt, Caps, Cmd, Shift
             scancode = 0
             while 1:
                 key_status = self.keyboard.getStatus()
-                if key_status['scancode']:
+                if key:
+                    if key == key_status['scancode']:
+                        break
+                elif key_status['scancode']:
                     break
                 time.sleep(0.05)
             return key_status
