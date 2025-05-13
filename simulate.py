@@ -99,7 +99,7 @@ class VIOS():
         pass
 
     def key_press(self, event):
-        print(f"按键按下: Keysym={event.keysym}, Char='{event.char}', Keycode={event.keycode}")
+        print(f"KeyPressed: Keysym={event.keysym}, Char='{event.char}', Keycode={event.keycode}")
         if "Shift_L" == event.keysym:
             self.key_state['Shift'] = not self.key_state['Shift']
             self.client.send_message('/avatar/parameters/Key/Output/Shift', self.key_state['Shift'])
@@ -120,7 +120,7 @@ class VIOS():
             self.client.send_message('/avatar/parameters/Key/Output/Int', keycode)
               
     def key_release(self, event):
-        print(f"按键释放: Keysym={event.keysym}, Char='{event.char}', Keycode={event.keycode}, State={event.state}")
+        print(f"KeyReleased: Keysym={event.keysym}, Char='{event.char}', Keycode={event.keycode}, State={event.state}")
         if event.keysym.upper() in self.reversed_keymap:
             keycode = self.reversed_keymap[event.keysym.upper()]
             self.client.send_message('/avatar/parameters/Key/Output/Int', 0)
