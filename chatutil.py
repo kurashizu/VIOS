@@ -6,6 +6,8 @@ from vkey import Keyboard
 from simpleim import SimpleIM
 import time
 import requests
+from threading import Thread
+import os
 
 with open('gemini_api_key.txt', 'r', encoding="utf-8") as gemini_api_key:
     API_KEY = gemini_api_key.read()
@@ -37,7 +39,6 @@ def chat_with_gemini(prompt: str):
     else:
         return f"Error {response.status_code}: {response.text}"
 
-
 if __name__ == "__main__":
     
     terminal = Terminal()
@@ -46,13 +47,31 @@ if __name__ == "__main__":
 
     keyboard.serve()
     keyboard.clear()
+    print("Waiting for VIOS connection...")
+    while not keyboard.connected:
+        time.sleep(0.5)
+    print("VIOS connected.")
+    print("Keyboard listening...")
+
+    def sync_daemon():
+        while keyboard.connected:
+            status = keyboard.getStatus()
+            if status['scancode'] == 53: # Sync
+                print("Resyncing...")
+                terminal.resync()
+                print("Synced.")
+            time.sleep(0.1)
+        print("VIOS disconnected.")
+        terminal.disable()
+        os._exit(0)
+    Thread(target=sync_daemon, daemon=True).start()
 
     terminal.enable()
     terminal.cursor_to(7,20)
     terminal.print("VIOS Initialising...".rjust(20))
     terminal.clear(force=True)
     
-    while True:
+    while keyboard.connected:
         terminal.cursor_to(0, 0)
         terminal.print("VIOS Chatbot <Type '/?' for help>".center(40,' '))
         terminal.print(" ")
