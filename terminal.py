@@ -75,7 +75,8 @@ class Terminal():
         self.cursor_col = col
 
     def resync(self):
-        self.content = [[' ' for j in range(40)] for i in range(8)]
+        self.content = [['\r' for j in range(40)] for i in range(8)]
+        self.write_cache(string="Resyncing...".rjust(20), region=15)
         self.refresh()
 
     def chatbox(self, msg, waiting_time=3):

@@ -157,7 +157,7 @@ class SimpleIM():
                 key_status = self.keyboard.getStatus()
                 if key_status['scancode']:
                     break
-                time.sleep(0.08)
+                time.sleep(0.05)
             return key_status
         
         def wait_key_released():
@@ -192,6 +192,10 @@ class SimpleIM():
                         char = char.upper()
                     canvas[cursor[0]][cursor[1]] = char
                     move_cursor('next')
+
+            elif key_status['scancode'] == 53: # sync
+                self.terminal.resync()
+                pass
 
             elif key_status['scancode'] == 76: # backspace
                 move_cursor('last')
@@ -228,6 +232,6 @@ if __name__ == "__main__":
     simpleim = SimpleIM(keyboard, terminal)
 
     while 1:
-        string = simpleim.input(offset=(3,5), size=(3,6))
+        string = simpleim.input(offset=(3,5), size=(3,10))
         print(f"Got user string: {string}")
     pass

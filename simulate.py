@@ -150,7 +150,7 @@ class VIOS():
         self.terminal.start()
         self.window.mainloop()
 
-    def terminal_daemon(self, interval=0.2):
+    def terminal_daemon(self, interval=0.1):
         while 1:
             self.text_area.delete("1.0", tk.END)
             for row in self.content:
