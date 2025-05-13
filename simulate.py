@@ -28,7 +28,7 @@ class VIOS():
         
         self.window = tk.Tk()
         self.window.title("VIOS")
-        self.window.geometry("800x400")
+        self.window.geometry("800x550")
         self.text_area = tk.Text(self.window, font=("Courier New", 24))
         self.text_area.config(state="normal")
         self.text_area.pack(expand=True, fill=tk.BOTH)
@@ -155,6 +155,13 @@ class VIOS():
             self.text_area.delete("1.0", tk.END)
             for row in self.content:
                 self.text_area.insert(tk.END, "".join(row) + "\n")
+            # print key_state
+            self.text_area.insert(tk.END, "\n")
+            self.text_area.insert(tk.END, f"Shift:{self.key_state['Shift']}\n")
+            self.text_area.insert(tk.END, f"Ctrl:{self.key_state['Ctrl']}\n")
+            self.text_area.insert(tk.END, f"Alt:{self.key_state['Alt']}\n")
+            self.text_area.insert(tk.END, f"Capslk:{self.key_state['Caps']}\n")
+            self.text_area.insert(tk.END, f"Fn:{self.key_state['Fn']}\n")
             time.sleep(interval)
 
 if __name__ == "__main__":

@@ -160,11 +160,6 @@ class Keyboard():
         self.lock.release()
         return status
     
-
-class SimpleIM():
-    def __init__(self):
-        pass
-
 if __name__ == "__main__":
     keyboard = Keyboard()
 

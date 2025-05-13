@@ -40,6 +40,11 @@ class Terminal():
                 self.write_cache(string=''.join(line[20:]), region=index*2+1)
                 self.content[index] = self.content[index][:20] + line[20:]
 
+    def print_buffer(self, string=""):
+        for s in string:
+            self.buffer[self.cursor_row][self.cursor_col] = s
+            self.cursor_col = (self.cursor_col+1)%40
+
     def print(self, string="", refresh=True, force=False):
         string += ' ' * ((40 - (len(string) % 40)) % 40)
 
