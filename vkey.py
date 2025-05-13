@@ -115,7 +115,7 @@ class Keyboard():
             self.connected = True
             self.counter = 0
 
-    def heartbeat(self):
+    def heartbeat_daemon(self):
         while 1:
             self.counter += 1
             time.sleep(0.5)
@@ -125,7 +125,7 @@ class Keyboard():
     def serve(self):
         self.thread = Thread(target=self.server.serve_forever, daemon=True)
         self.thread.start()
-        self.heartbeat = Thread(target=self.heartbeat, daemon=True)
+        self.heartbeat = Thread(target=self.heartbeat_daemon, daemon=True)
         self.heartbeat.start()
 
     def sendKey(self, key='shift', value=False):
