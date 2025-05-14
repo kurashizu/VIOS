@@ -69,7 +69,7 @@ if __name__ == "__main__":
     print("Loading config.json ...")
     with open('config.json', 'r', encoding="utf-8") as config:
         cfg = json.load(config)["chatutil_config"]
-    
+
     if cfg["model_type"] == "ollama":
         chatbot = Ollama(model_name=cfg["ollama_model_name"], IP=cfg["ollama_IP"], port=cfg["ollama_port"], context_length=cfg["ollama_context_length"])
         pass
@@ -84,6 +84,8 @@ if __name__ == "__main__":
     keyboard = Keyboard(IP=cfg["VIOS_IP"], listening_port=cfg["VIOS_listening_port"], sending_port=cfg["VIOS_sending_port"])
     simpleim = SimpleIM(keyboard, terminal)
     IS_BANNER_ENABLED = cfg["is_banner_enabled"]
+    BANNER_MSG = cfg["banner_message"]
+    PROMPT = cfg["prompt"]
 
     print("config.json loaded.")
     # config loaded
@@ -110,12 +112,9 @@ if __name__ == "__main__":
     Thread(target=sync_daemon, daemon=True).start()
 
     def banner():
-            msg = "VIOS (Virtual IO System)\n"
-            msg += "Chatbot Utility Running\n"
-            # msg += 'Press "Sync" (the red button on the keyboard) to start\n'
-            msg += '首先点击键盘左上角的Sync键(红色)进行同步，然后在输入框里输入文本，输入完后按Enter键获取AI回复。'
             while 1:
-                terminal.chatbox(msg)
+                terminal.chatbox(BANNER_MSG)
+                time.sleep(3)
             pass
     if IS_BANNER_ENABLED:
         Thread(target=banner, daemon=True).start()
@@ -149,11 +148,7 @@ if __name__ == "__main__":
             keyboard.waitKey(41) # wait for Esc
             continue
 
-        prompt = f'Your name is VIOS standing for Virtual IO System. You are gonna receive message from a user \
-            who are talking to you. You should make a short response less than 300 letters in total. \
-            And remember you can respond in English with only ASCII characters! \
-            But you can understand 拼音 if the user send you. \
-            The user is saying : "{user_input}"'
+        prompt = PROMPT.replace(r'{user_input}', user_input)
         
         terminal.cursor_to(0, 0)
         terminal.print("VIOS Thinking".center(40,'-'))
