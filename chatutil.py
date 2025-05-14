@@ -8,42 +8,85 @@ import time
 import requests
 from threading import Thread
 import os
+import json
 
-with open('gemini_api_key.txt', 'r', encoding="utf-8") as gemini_api_key:
-    API_KEY = gemini_api_key.read()
+class Gemini():
+    def __init__(self, API_KEY: str):
+        self.API_URL = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={API_KEY}"
+        self.headers = {"Content-Type": "application/json"}
 
-API_URL = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={API_KEY}"
+    def chat(self, prompt: str):
+        data = {"contents": [{"parts": [{"text": prompt}]}]}
+        response = requests.post(self.API_URL, headers=self.headers, json=data)
+        if response.status_code == 200:
+            reply = response.json()["candidates"][0]["content"]["parts"][0]["text"]
+            return reply
+        else:
+            return f"Error {response.status_code}: {response.text}"
 
-headers = {
-    "Content-Type": "application/json"
-}
+class Ollama():
+    def __init__(self,
+                 model_name: str,
+                 IP='127.0.0.1',
+                 port=11434,
+                 context_length=1):
+        
+        self.chat_history = []
+        self.context_length = context_length
+        self.model = model_name
+        self.IP = IP
+        self.port = port
+        pass
 
-def chat_with_gemini(prompt: str):
-    data = {
-        "contents": [
-            {
-                "parts": [
-                    {
-                        "text": prompt
-                    }
-                ]
+    def chat(self, prompt: str, image=None):
+        chat = {
+            'role': 'user', 
+            'content': prompt,
             }
-        ]
-    }
+        if image:
+            chat['images'] = [image]
+        self.chat_history.append(chat)
 
-    response = requests.post(API_URL, headers=headers, json=data)
+        self.chat_history = self.chat_history[-self.context_length:]
 
-    if response.status_code == 200:
-        reply = response.json()["candidates"][0]["content"]["parts"][0]["text"]
+        response = requests.post(
+            f'http://{self.IP}:{self.port}/api/chat',
+            json={
+                'model': self.model,
+                'messages': self.chat_history,
+                'stream': False,
+            }
+        )
+
+        reply = response.json()['message']['content']
+        self.chat_history.append({'role': 'assistant', 'content': reply})
+
         return reply
-    else:
-        return f"Error {response.status_code}: {response.text}"
-
+    
 if __name__ == "__main__":
     
-    terminal = Terminal()
-    keyboard = Keyboard()
+    # load config
+    print("Loading config.json ...")
+    with open('config.json', 'r', encoding="utf-8") as config:
+        cfg = json.load(config)["chatutil_config"]
+    
+    if cfg["model_type"] == "ollama":
+        chatbot = Ollama(model_name=cfg["ollama_model_name"], IP=cfg["ollama_IP"], port=cfg["ollama_port"], context_length=cfg["ollama_context_length"])
+        pass
+    elif cfg["model_type"] == "gemini":
+        chatbot = Gemini(API_KEY=cfg["gemini_api_key"])
+        pass
+    else:
+        print("No valid model_type specified")
+        os._exit()
+    
+    terminal = Terminal(IP=cfg["VIOS_IP"], sending_port=cfg["VIOS_sending_port"], waiting_time=cfg["VIOS_Terminal"]["waiting_time"])
+    keyboard = Keyboard(IP=cfg["VIOS_IP"], listening_port=cfg["VIOS_listening_port"], sending_port=cfg["VIOS_sending_port"])
     simpleim = SimpleIM(keyboard, terminal)
+    IS_BANNER_ENABLED = cfg["is_banner_enabled"]
+
+    print("config.json loaded.")
+    # config loaded
 
     keyboard.serve()
     keyboard.clear()
@@ -74,7 +117,8 @@ if __name__ == "__main__":
             while 1:
                 terminal.chatbox(msg)
             pass
-    # Thread(target=banner, daemon=True).start()
+    if IS_BANNER_ENABLED:
+        Thread(target=banner, daemon=True).start()
 
     terminal.enable()
     terminal.cursor_to(7,20)
@@ -89,6 +133,7 @@ if __name__ == "__main__":
         terminal.print(" ")
 
         user_input = simpleim.input(offset=(4,0), size=(4,40))
+        print(f"Got user input: {user_input}")
 
         if user_input == '/h':
             user_outputs = []
@@ -112,7 +157,7 @@ if __name__ == "__main__":
         
         terminal.cursor_to(0, 0)
         terminal.print("VIOS Thinking".center(40,'-'))
-        response = chat_with_gemini(prompt)
+        response = chatbot.chat(prompt=prompt)
         user_output = f"VIOS: {response}".ljust(160-6)
         
         print(user_output)

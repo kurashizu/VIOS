@@ -12,11 +12,11 @@ print("Loading config.json...")
 with open('config.json', 'r', encoding="utf-8") as config:
     cfg = json.load(config)
 
-IP=cfg["IP"]
-sending_port=cfg["sending_port"]
-listening_port=cfg["listening_port"]
-terminal_waiting_time=cfg["terminal"]["waiting_time"]
-is_banner_enabled = cfg["is_banner_enabled"]
+IP=cfg["kbtestutil_config"]["IP"]
+sending_port=cfg["kbtestutil_config"]["sending_port"]
+listening_port=cfg["kbtestutil_config"]["listening_port"]
+terminal_waiting_time=cfg["kbtestutil_config"]["terminal"]["waiting_time"]
+is_banner_enabled = cfg["kbtestutil_config"]["is_banner_enabled"]
 print("Config.json loaded.")
 
 # Initialise

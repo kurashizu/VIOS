@@ -1,9 +1,34 @@
 {
-    "IP": "127.0.0.1",
-    "sending_port": 9000,
-    "listening_port": 9001,
-    "terminal": {
-        "waiting_time": 0.25
+    "kbtestutil_config": {
+        "IP": "127.0.0.1",
+        "sending_port": 9000,
+        "listening_port": 9001,
+        "terminal": {
+            "waiting_time": 0.25
+        },
+        "is_banner_enabled": false
     },
-    "is_banner_enabled": false
+
+    "chatutil_config": {
+        "_comments": [
+            "model_type: can be <ollama> or <gemini>",
+            "if <gemini> is used, you should provide a gemini api key",
+            "if <ollama> is used, you should specify the ollama_model_name, eg. <gemma3:4b>, and IP and port where ollama serves"
+        ],
+
+        "model_type": "ollama",
+        "gemini_api_key": "",
+        "ollama_model_name": "gemma3:4b",
+        "ollama_IP": "127.0.0.1",
+        "ollama_port": 11434,
+        "ollama_context_length": 1,
+
+        "VIOS_IP": "127.0.0.1",
+        "VIOS_sending_port": 9000,
+        "VIOS_listening_port": 9001,
+        "VIOS_Terminal": {
+            "waiting_time": 0.25
+        },
+        "is_banner_enabled": false
+    }
 }
