@@ -1,5 +1,5 @@
 # AI Chatbot Utility
-# In the working directory, you shold have a 'gemini_api_key.txt' where your gemini api key is.
+# Make sure you have read config.json carefully before run this script
 
 from terminal import Terminal
 from vkey import Keyboard
